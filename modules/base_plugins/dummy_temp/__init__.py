@@ -13,10 +13,9 @@ class DummyTempSensor(SensorActive):
 
     temp = Property.Number("Temperature", configurable=True, default_value=5, description="Dummy Temperature as decimal value")
 
-    @cbpi.action("My Custom Action")
-    def my_action(self):
-        print "HELLO WORLD"
-        pass
+#    @cbpi.action("Set Temperature")
+#    def my_action(self):
+#        pass
 
     def get_unit(self):
         '''

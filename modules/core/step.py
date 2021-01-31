@@ -43,6 +43,23 @@ class KettleAPI(NotificationAPI):
             id = self.kettle_id
         return self.api.cache.get("kettle").get(id).target_temp
 
+    @cbpi.try_catch(None)
+    def get_kettle_auto(self, id=None):
+        id = int(id)
+        if id is None:
+            id = self.kettle_id
+        return self.api.cache.get("kettle").get(id).state
+
+    @cbpi.try_catch(None)
+    def set_kettle_auto(self, auto, id=None):
+        id = int(id)
+        if id is None:
+            id = self.kettle_id
+        if auto == 1 or auto == 0:
+            self.api.cache.get("kettle").get(id).state = auto
+            self.notify("Auto State", "Set to "+str(auto), type="info")
+            cbpi.emit("UPDATE_KETTLE", cbpi.cache.get("kettle").get(id))
+
     def set_target_temp(self, temp, id=None):
         temp = float(temp)
 

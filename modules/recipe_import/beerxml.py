@@ -52,12 +52,14 @@ class BeerXMLImport(FlaskView):
         name = self.getRecipeName(id)
         self.api.set_config_parameter("brew_name", name)
         boil_time = self.getBoilTime(id)
-        mashstep_type = cbpi.get_config_parameter("step_mash", "MashStep")
+        mashstep_type = cbpi.get_config_parameter("step_mash", "Rast")
         mash_kettle = cbpi.get_config_parameter("step_mash_kettle", None)
 
-        boilstep_type = cbpi.get_config_parameter("step_boil", "BoilStep")
+        chillstep_type = cbpi.get_config_parameter("chill_step", "Timer")
+
+        boilstep_type = cbpi.get_config_parameter("step_boil", "Kochen")
         boil_kettle = cbpi.get_config_parameter("step_boil_kettle", None)
-        boil_temp = 100 if cbpi.get_config_parameter("unit", "C") == "C" else 212
+        boil_temp = 150 if cbpi.get_config_parameter("unit", "C") == "C" else 212
 
         # READ KBH DATABASE
         Step.delete_all()
@@ -67,7 +69,7 @@ class BeerXMLImport(FlaskView):
 
             for row in steps:
                 Step.insert(**{"name": row.get("name"), "type": mashstep_type, "config": {"kettle": mash_kettle, "temp": float(row.get("temp")), "timer": row.get("timer")}})
-            Step.insert(**{"name": "ChilStep", "type": "ChilStep", "config": {"timer": 15}})
+            Step.insert(**{"name": "ChillStep", "type": chillstep_type, "config": {"timer": 15}})
             ## Add boiling step
             Step.insert(**{
                 "name": "Boil",
@@ -89,7 +91,7 @@ class BeerXMLImport(FlaskView):
                 }
             })
             ## Add Whirlpool step
-            Step.insert(**{"name": "Whirlpool", "type": "ChilStep", "config": {"timer": 15}})
+            Step.insert(**{"name": "Whirlpool", "type": chillstep_type, "config": {"timer": 15}})
             StepView().reset()
             self.api.emit("UPDATE_ALL_STEPS", Step.get_all())
             self.api.notify(headline="Recipe %s loaded successfully" % name, message="")

@@ -67,6 +67,8 @@ class ControllerBase(object):
         self.api = kwds.get("api")
         self.heater = kwds.get("heater")
         self.sensor = kwds.get("sensor")
+#        self.agitator = kwds.get("agitator")
+#        cbpi.notify("Kettle",str(self.agitator),"info",0)
 
 
     def run(self):
@@ -92,8 +94,11 @@ class KettleController(ControllerBase, ActorController, SensorController):
         if k.heater is not None:
             self.actor_on(power, int(k.heater))
 
-
-
+    @cbpi.try_catch(None)
+    def heater_power(self, power):
+        k = self.api.cache.get("kettle").get(self.kettle_id)
+        if k.heater is not None:
+            self.actor_power(power, int(k.heater))
 
     @cbpi.try_catch(None)
     def heater_off(self):
